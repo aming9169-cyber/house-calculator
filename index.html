@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>房屋單坪價格計算器</title>
+    <!-- 使用 Tailwind CSS 快速構建美觀介面 -->
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+
+    <!-- App 容器 -->
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden mt-4">
+        
+        <!-- 1. 標題區 -->
+        <div class="bg-blue-600 p-5 text-center">
+            <h1 class="text-white text-xl font-bold tracking-wide">🏠 房屋單坪價格計算器</h1>
+            <p class="text-blue-100 text-xs mt-1">精確扣除車位，算出真實房屋單價</p>
+        </div>
+
+        <!-- 2. 輸入區 -->
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="block text-gray-700 text-sm font-semibold mb-1">總坪數 (坪)</label>
+                <input type="number" id="totalPing" placeholder="請輸入總坪數" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-semibold mb-1">車位坪數 (坪)</label>
+                <input type="number" id="carPing" placeholder="請輸入車位坪數 (無車位填 0)" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="0">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-semibold mb-1">房屋總價 (萬元)</label>
+                <input type="number" id="totalPrice" placeholder="請輸入房屋總價" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-semibold mb-1">車位價格 (萬元)</label>
+                <input type="number" id="carPrice" placeholder="請輸入車位價格 (無車位填 0)" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="0">
+            </div>
+
+            <!-- 計算按鈕 -->
+            <button onclick="calculate()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-200 mt-2 shadow-md">
+                ⚡ 開始計算
+            </button>
+        </div>
+
+        <!-- 3. 輸出結果區 -->
+        <div class="bg-emerald-50 p-6 border-t border-emerald-100 space-y-4">
+            <h2 class="text-emerald-800 font-bold text-lg mb-2 flex items-center">
+                📊 計算結果 <span class="text-xs font-normal text-emerald-600 ml-2">(四捨五入至小數點後2位)</span>
+            </h2>
+            
+            <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                <span class="text-gray-600 text-sm font-medium">淨房屋坪數</span>
+                <span class="text-emerald-700 font-bold text-lg" id="resHousePing">0.00 <span class="text-xs font-normal text-gray-500">坪</span></span>
+            </div>
+
+            <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-amber-500">
+                <span class="text-gray-900 text-sm font-bold">萬/坪 (扣除車位)</span>
+                <span class="text-amber-600 font-extrabold text-xl" id="resPriceExcludeCar">0.00 <span class="text-xs font-normal text-gray-500">萬/坪</span></span>
+            </div>
+
+            <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                <span class="text-gray-600 text-sm font-medium">萬/坪 (包含車位)</span>
+                <span class="text-gray-700 font-bold text-lg" id="resPriceIncludeCar">0.00 <span class="text-xs font-normal text-gray-500">萬/坪</span></span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 4. 核心計算邏輯 (JavaScript) -->
+    <script>
+        function calculate() {
+            // 讀取輸入值並轉為數字
+            const totalPing = parseFloat(document.getElementById('totalPing').value) || 0;
+            const carPing = parseFloat(document.getElementById('carPing').value) || 0;
+            const totalPrice = parseFloat(document.getElementById('totalPrice').value) || 0;
+            const carPrice = parseFloat(document.getElementById('carPrice').value) || 0;
+
+            // 防呆機制：檢查基本欄位是否輸入
+            if (totalPing <= 0 || totalPrice <= 0) {
+                alert("請填寫正確的總坪數與房屋總價！");
+                return;
+            }
+
+            if (totalPing <= carPing) {
+                alert("錯誤：車位坪數不能大於或等於總坪數！");
+                return;
+            }
+
+            if (totalPrice <= carPrice) {
+                alert("錯誤：車位價格不能大於或等於房屋總價！");
+                return;
+            }
+
+            // 執行公式計算
+            // 4.1. 房屋坪數 = 總坪數 - 車位坪數
+            const housePing = totalPing - carPing;
+
+            // 4.2. 萬/坪 (不含車位) = (房屋總價 - 車位價) / 房屋坪數
+            const priceExcludeCar = (totalPrice - carPrice) / housePing;
+
+            // 4.3. 萬/坪 (含車位) = 房屋總價 / 總坪數
+            const priceIncludeCar = totalPrice / totalPing;
+
+            // 將結果渲染至畫面，並四捨五入至小數點後 2 位
+            document.getElementById('resHousePing').innerHTML = `${housePing.toFixed(2)} <span class="text-xs font-normal text-gray-500">坪</span>`;
+            document.getElementById('resPriceExcludeCar').innerHTML = `${priceExcludeCar.toFixed(2)} <span class="text-xs font-normal text-gray-500">萬/坪</span>`;
+            document.getElementById('resPriceIncludeCar').innerHTML = `${priceIncludeCar.toFixed(2)} <span class="text-xs font-normal text-gray-500">萬/坪</span>`;
+        }
+    </script>
+</body>
+</html>
