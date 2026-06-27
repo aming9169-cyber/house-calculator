@@ -37,9 +37,9 @@
                 <input type="number" id="carPrice" placeholder="請輸入車位價格 (無車位填 0)" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="0">
             </div>
 
-            <!-- 計算按鈕 -->
-            <button onclick="calculate()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-200 mt-2 shadow-md">
-                ⚡ 開始計算
+            <!-- 計算按鈕 (超級巨大版本：文字 text-6xl、閃電 text-7xl、內襯高 py-10) -->
+            <button onclick="calculate()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-10 rounded-2xl transition duration-200 mt-4 shadow-2xl flex flex-col items-center justify-center gap-2 text-6xl tracking-widest">
+                <span class="text-7xl animate-bounce">⚡</span> 開始計算
             </button>
         </div>
 
@@ -70,13 +70,11 @@
     <!-- 4. 核心計算邏輯 (JavaScript) -->
     <script>
         function calculate() {
-            // 讀取輸入值並轉為數字
             const totalPing = parseFloat(document.getElementById('totalPing').value) || 0;
             const carPing = parseFloat(document.getElementById('carPing').value) || 0;
             const totalPrice = parseFloat(document.getElementById('totalPrice').value) || 0;
             const carPrice = parseFloat(document.getElementById('carPrice').value) || 0;
 
-            // 防呆機制：檢查基本欄位是否輸入
             if (totalPing <= 0 || totalPrice <= 0) {
                 alert("請填寫正確的總坪數與房屋總價！");
                 return;
@@ -92,17 +90,10 @@
                 return;
             }
 
-            // 執行公式計算
-            // 4.1. 房屋坪數 = 總坪數 - 車位坪數
             const housePing = totalPing - carPing;
-
-            // 4.2. 萬/坪 (不含車位) = (房屋總價 - 車位價) / 房屋坪數
             const priceExcludeCar = (totalPrice - carPrice) / housePing;
-
-            // 4.3. 萬/坪 (含車位) = 房屋總價 / 總坪數
             const priceIncludeCar = totalPrice / totalPing;
 
-            // 將結果渲染至畫面，並四捨五入至小數點後 2 位
             document.getElementById('resHousePing').innerHTML = `${housePing.toFixed(2)} <span class="text-xs font-normal text-gray-500">坪</span>`;
             document.getElementById('resPriceExcludeCar').innerHTML = `${priceExcludeCar.toFixed(2)} <span class="text-xs font-normal text-gray-500">萬/坪</span>`;
             document.getElementById('resPriceIncludeCar').innerHTML = `${priceIncludeCar.toFixed(2)} <span class="text-xs font-normal text-gray-500">萬/坪</span>`;
